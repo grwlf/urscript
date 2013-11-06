@@ -1,0 +1,3 @@
+ffi Script
+include Script.h
+link Script.o
