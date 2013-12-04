@@ -8,7 +8,6 @@ fun main {} : transaction page =
     <xml>
       <head>
         {s}
-        <script type={blessMime "text/javascript"} src={bless "http://code.jquery.com/ui/1.10.3/jquery-ui.js"}/>
       </head>
       <body>
       </body>

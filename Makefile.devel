@@ -10,17 +10,21 @@ ifdef MAIN
 URCC = $(shell $(shell urweb -print-ccompiler) -print-prog-name=gcc)
 URINCL = $(shell urweb -print-cinclude)
 .PHONY: run
-run: ./Test1.exe
+run: ./Makefile.devel ./Test1.exe
 	./Test1.exe
 .PHONY: all
-all: ./Script.urp ./Test1.exe
-./Test1.exe: ./Test1.urp
+all: ./Makefile.devel ./Script.urp ./Test1.exe
+./Test1.exe: ./Makefile.devel ./Test1.urp
 	urweb -dbms sqlite ./Test1
-./Script.o: ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL)
+./Cakegen: ./Cakefile.hs
+	cake3
+./Makefile.devel: ./Cakegen
+	./Cakegen
+./Script.o: ./Makefile.devel ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL)
 	$(URCC) -c -I $(URINCL) -o ./Script.o ./Script.c
-./Script.urp: ./Script.h ./Script.o
+./Script.urp: ./Makefile.devel ./Script.h ./Script.o
 	touch ./Script.urp
-./Test1.urp: ./Script.urp ./Test1.ur
+./Test1.urp: ./Makefile.devel ./Script.urp ./Test1.ur
 	touch ./Test1.urp
 $(call GUARD,URCC):
 	rm -f .GUARD_URCC_*
@@ -39,6 +43,10 @@ run: .fix-multy1
 all: .fix-multy1
 .PHONY: ./Test1.exe
 ./Test1.exe: .fix-multy1
+.PHONY: ./Cakegen
+./Cakegen: .fix-multy1
+.PHONY: ./Makefile.devel
+./Makefile.devel: .fix-multy1
 .PHONY: ./Script.o
 ./Script.o: .fix-multy1
 .PHONY: ./Script.urp
