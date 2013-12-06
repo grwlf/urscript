@@ -9,6 +9,7 @@ ifdef MAIN
 
 URCC = $(shell $(shell urweb -print-ccompiler) -print-prog-name=gcc)
 URINCL = $(shell urweb -print-cinclude)
+URVERSION = $(shell urweb -version)
 .PHONY: all
 all: ./Script.urp ./Test1.exe ./Test2.exe
 .PHONY: clean
@@ -17,9 +18,9 @@ clean:
 .PHONY: run
 run: ./Test1.exe
 	./Test1.exe
-./Test2.exe: ./Test2.urp
+./Test2.exe: ./Test2.urp $(call GUARD,URVERSION)
 	urweb -dbms sqlite ./Test2
-./Test1.exe: ./Test1.urp
+./Test1.exe: ./Test1.urp $(call GUARD,URVERSION)
 	urweb -dbms sqlite ./Test1
 ./Script.o: ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL)
 	$(URCC) -c -I $(URINCL) -o ./Script.o ./Script.c
@@ -34,6 +35,9 @@ $(call GUARD,URCC):
 	touch $@
 $(call GUARD,URINCL):
 	rm -f .cake3/GUARD_URINCL_*
+	touch $@
+$(call GUARD,URVERSION):
+	rm -f .cake3/GUARD_URVERSION_*
 	touch $@
 
 else
