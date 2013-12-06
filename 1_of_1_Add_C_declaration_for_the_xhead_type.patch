@@ -1,0 +1,19 @@
+# HG changeset patch
+# User Sergey Mironov <grrwlf@gmail.com>
+# Date 1383731730 -14400
+#      Wed Nov 06 13:55:30 2013 +0400
+# Node ID 55613370c964970204167390cadf609d108225fd
+# Parent  c1dd3f41166a08c9486ae9f9bed6dd178e328d5a
+Add C declaration for the xhead type
+
+diff --git a/include/urweb/types_cpp.h b/include/urweb/types_cpp.h
+--- a/include/urweb/types_cpp.h
++++ b/include/urweb/types_cpp.h
+@@ -26,6 +26,7 @@
+ typedef uw_Basis_string uw_Basis_xhtml;
+ typedef uw_Basis_string uw_Basis_page;
+ typedef uw_Basis_string uw_Basis_xbody;
++typedef uw_Basis_string uw_Basis_xhead;
+ typedef uw_Basis_string uw_Basis_css_class;
+ 
+ typedef unsigned uw_Basis_client;
