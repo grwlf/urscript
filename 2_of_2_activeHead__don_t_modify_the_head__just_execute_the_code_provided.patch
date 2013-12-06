@@ -1,0 +1,35 @@
+# HG changeset patch
+# User Sergey Mironov <grrwlf@gmail.com>
+# Date 1386327167 -14400
+#      Fri Dec 06 14:52:47 2013 +0400
+# Node ID c3b7188012a470e2c448f0a471685be28c858253
+# Parent  024df3bb9c61467a46e7dc5f077deaa98f1e7b2e
+activeHead: don't modify the head. just execute the code provided
+
+diff --git a/lib/ur/basis.urs b/lib/ur/basis.urs
+--- a/lib/ur/basis.urs
++++ b/lib/ur/basis.urs
+@@ -784,7 +784,7 @@
+              -> tag [Code = transaction xbody] body [] [] []
+ 
+ val activeHead : unit
+-             -> tag [Code = transaction xhead] head [] [] []
++             -> tag [Code = transaction unit] head [] [] []
+ 
+ val head : unit -> tag [] html head [] []
+ val title : unit -> tag [] head [] [] []
+diff --git a/src/monoize.sml b/src/monoize.sml
+--- a/src/monoize.sml
++++ b/src/monoize.sml
+@@ -3610,9 +3610,9 @@
+                         (case attrs of
+ 			     [("Code", e, _)] =>
+ 			     ((L'.EStrcat
+-                                   ((L'.EPrim (Prim.String ("<script type=\"text/javascript\">active(execD(")), loc),
++                                   ((L'.EPrim (Prim.String ("<script type=\"text/javascript\">execD(")), loc),
+                                     (L'.EStrcat ((L'.EJavaScript (L'.Script, e), loc),
+-                                                 (L'.EPrim (Prim.String ("))</script>")), loc)), loc)), loc),
++                                                 (L'.EPrim (Prim.String (")</script>")), loc)), loc)), loc),
+ 			      fm)
+                            | _ => raise Fail "Monoize: Bad <activeHead> attributes")
+ 

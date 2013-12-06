@@ -1,0 +1,52 @@
+# HG changeset patch
+# User Sergey Mironov <grrwlf@gmail.com>
+# Date 1386323979 -14400
+#      Fri Dec 06 13:59:39 2013 +0400
+# Node ID 596f33356e946f6d429d14d32c96763585798889
+# Parent  55613370c964970204167390cadf609d108225fd
+Add activeHead tag.
+
+activeHead is similar to active but produces xhead instead of xbody
+
+diff --git a/lib/ur/basis.urs b/lib/ur/basis.urs
+--- a/lib/ur/basis.urs
++++ b/lib/ur/basis.urs
+@@ -782,6 +782,9 @@
+ val active : unit
+              -> tag [Code = transaction xbody] body [] [] []
+ 
++val activeHead : unit
++             -> tag [Code = transaction xhead] head [] [] []
++
+ val head : unit -> tag [] html head [] []
+ val title : unit -> tag [] head [] [] []
+ val link : unit -> tag [Id = id, Rel = string, Typ = string, Href = url, Media = string] head [] [] []
+diff --git a/src/monoize.sml b/src/monoize.sml
+--- a/src/monoize.sml
++++ b/src/monoize.sml
+@@ -3264,7 +3264,7 @@
+                 val (style, fm) = monoExp (env, st, fm) style
+                 val (dynStyle, fm) = monoExp (env, st, fm) dynStyle
+ 
+-                val dynamics = ["dyn", "ctextbox", "ccheckbox", "cselect", "coption", "ctextarea", "active"]
++                val dynamics = ["dyn", "ctextbox", "ccheckbox", "cselect", "coption", "ctextarea", "active", "activeHead"]
+ 
+                 fun isSome (e, _) =
+                     case e of
+@@ -3600,6 +3600,16 @@
+ 			      fm)
+                            | _ => raise Fail "Monoize: Bad <active> attributes")
+ 
++                      | "activeHead" =>
++                        (case attrs of
++			     [("Code", e, _)] =>
++			     ((L'.EStrcat
++                                   ((L'.EPrim (Prim.String ("<script type=\"text/javascript\">active(execD(")), loc),
++                                    (L'.EStrcat ((L'.EJavaScript (L'.Script, e), loc),
++                                                 (L'.EPrim (Prim.String ("))</script>")), loc)), loc)), loc),
++			      fm)
++                           | _ => raise Fail "Monoize: Bad <activeHead> attributes")
++
+                       | "submit" => normal ("input type=\"submit\"", NONE)
+                       | "image" => normal ("input type=\"image\"", NONE)
+                       | "button" => normal ("input type=\"submit\"", NONE)

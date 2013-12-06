@@ -10,13 +10,15 @@ ifdef MAIN
 URCC = $(shell $(shell urweb -print-ccompiler) -print-prog-name=gcc)
 URINCL = $(shell urweb -print-cinclude)
 .PHONY: all
-all: ./Script.urp ./Test1.exe
+all: ./Script.urp ./Test1.exe ./Test2.exe
 .PHONY: clean
 clean: 
 	rm -rf .cake3 ./Script.o ./Test1.exe
 .PHONY: run
 run: ./Test1.exe
 	./Test1.exe
+./Test2.exe: ./Test2.urp
+	urweb -dbms sqlite ./Test2
 ./Test1.exe: ./Test1.urp
 	urweb -dbms sqlite ./Test1
 ./Script.o: ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL)
@@ -25,6 +27,8 @@ run: ./Test1.exe
 	touch ./Script.urp
 ./Test1.urp: ./Script.urp ./Test1.ur
 	touch ./Test1.urp
+./Test2.urp: ./Script.urp ./Test2.ur
+	touch ./Test2.urp
 $(call GUARD,URCC):
 	rm -f .cake3/GUARD_URCC_*
 	touch $@
@@ -42,6 +46,8 @@ all: .fix-multy1
 clean: .fix-multy1
 .PHONY: run
 run: .fix-multy1
+.PHONY: ./Test2.exe
+./Test2.exe: .fix-multy1
 .PHONY: ./Test1.exe
 ./Test1.exe: .fix-multy1
 .PHONY: ./Script.o
@@ -50,6 +56,8 @@ run: .fix-multy1
 ./Script.urp: .fix-multy1
 .PHONY: ./Test1.urp
 ./Test1.urp: .fix-multy1
+.PHONY: ./Test2.urp
+./Test2.urp: .fix-multy1
 .INTERMEDIATE: .fix-multy1
 .fix-multy1: 
 	-mkdir .cake3
