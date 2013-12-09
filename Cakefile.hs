@@ -16,18 +16,20 @@ project = do
     link "Script.o"
 
   t <- uwapp "-dbms sqlite" "Test1.urp" $ do
-    allow url "http://code.jquery.com/ui/1.10.3/jquery-ui.js";
-    allow mime "text/javascript";
-    library (internal u);
+    allow url "http://code.jquery.com/ui/1.10.3/jquery-ui.js"
+    allow mime "text/javascript"
+    library u
     debug
     module_ (single "Test1.ur")
 
+  {-
   t2 <- uwapp "-dbms sqlite" "Test2.urp" $ do
-    allow url "http://code.jquery.com/ui/1.10.3/jquery-ui.js";
-    allow mime "text/javascript";
-    library (internal u);
+    allow url "http://code.jquery.com/ui/1.10.3/jquery-ui.js"
+    allow mime "text/javascript"
+    library u
     debug
     module_ (single "Test2.ur")
+  -}
 
   rule $ do
     phony "run"
@@ -41,7 +43,6 @@ project = do
     phony "all"
     depend u
     depend t
-    depend t2
 
   return ()
 
