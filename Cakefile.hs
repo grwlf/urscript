@@ -10,7 +10,7 @@ project = do
 
   prebuild [cmd|urweb -print-cinclude >/dev/null|]
 
-  u <- uwlib "Script.urp" $ do
+  u <- uwlib "lib.urp" $ do
     ffi "Script.urs"
     include "Script.h"
     link "Script.o"

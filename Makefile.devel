@@ -11,7 +11,7 @@ URCC = $(shell $(shell urweb -print-ccompiler) -print-prog-name=gcc)
 URINCL = $(shell urweb -print-cinclude)
 URVERSION = $(shell urweb -version)
 .PHONY: all
-all: ./Makefile.devel ./Script.urp ./Test1.exe
+all: ./Makefile.devel ./Test1.exe ./lib.urp
 .PHONY: clean
 clean: ./Makefile.devel
 	rm -rf .cake3 ./Script.o ./Test1.exe
@@ -26,10 +26,10 @@ run: ./Makefile.devel ./Test1.exe
 	./Cakegen
 ./Script.o: ./Makefile.devel ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL)
 	$(URCC) -c -I $(URINCL) -o ./Script.o ./Script.c
-./Script.urp: ./Makefile.devel ./Script.h ./Script.o
-	touch ./Script.urp
-./Test1.urp: ./Makefile.devel ./Script.urp ./Test1.ur
+./Test1.urp: ./Makefile.devel ./Test1.ur ./lib.urp
 	touch ./Test1.urp
+./lib.urp: ./Makefile.devel ./Script.h ./Script.o
+	touch ./lib.urp
 $(call GUARD,URCC):
 	rm -f .cake3/GUARD_URCC_*
 	touch $@
@@ -58,10 +58,10 @@ run: .fix-multy1
 ./Makefile.devel: .fix-multy1
 .PHONY: ./Script.o
 ./Script.o: .fix-multy1
-.PHONY: ./Script.urp
-./Script.urp: .fix-multy1
 .PHONY: ./Test1.urp
 ./Test1.urp: .fix-multy1
+.PHONY: ./lib.urp
+./lib.urp: .fix-multy1
 .INTERMEDIATE: .fix-multy1
 .fix-multy1: 
 	-mkdir .cake3

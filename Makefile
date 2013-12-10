@@ -11,7 +11,7 @@ URCC = $(shell $(shell urweb -print-ccompiler) -print-prog-name=gcc)
 URINCL = $(shell urweb -print-cinclude)
 URVERSION = $(shell urweb -version)
 .PHONY: all
-all: ./Script.urp ./Test1.exe
+all: ./Test1.exe ./lib.urp
 .PHONY: clean
 clean: 
 	rm -rf .cake3 ./Script.o ./Test1.exe
@@ -22,10 +22,10 @@ run: ./Test1.exe
 	urweb -dbms sqlite ./Test1
 ./Script.o: ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL)
 	$(URCC) -c -I $(URINCL) -o ./Script.o ./Script.c
-./Script.urp: ./Script.h ./Script.o
-	touch ./Script.urp
-./Test1.urp: ./Script.urp ./Test1.ur
+./Test1.urp: ./Test1.ur ./lib.urp
 	touch ./Test1.urp
+./lib.urp: ./Script.h ./Script.o
+	touch ./lib.urp
 $(call GUARD,URCC):
 	rm -f .cake3/GUARD_URCC_*
 	touch $@
@@ -50,10 +50,10 @@ run: .fix-multy1
 ./Test1.exe: .fix-multy1
 .PHONY: ./Script.o
 ./Script.o: .fix-multy1
-.PHONY: ./Script.urp
-./Script.urp: .fix-multy1
 .PHONY: ./Test1.urp
 ./Test1.urp: .fix-multy1
+.PHONY: ./lib.urp
+./lib.urp: .fix-multy1
 .INTERMEDIATE: .fix-multy1
 .fix-multy1: 
 	-mkdir .cake3
