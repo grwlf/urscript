@@ -3,12 +3,13 @@
 
 GUARD = .cake3/GUARD_$(1)_$(shell echo $($(1)) | md5sum | cut -d ' ' -f 1)
 
-ifdef MAIN
+ifeq ($(MAIN),1)
+unexport MAIN
 
 # Main section
 
 URCC = $(shell $(shell urweb -print-ccompiler) -print-prog-name=gcc)
-URINCL = $(shell urweb -print-cinclude)
+URINCL = -I$(shell urweb -print-cinclude) 
 URVERSION = $(shell urweb -version)
 .PHONY: all
 all: ./Test1.exe ./lib.urp
@@ -20,12 +21,16 @@ run: ./Test1.exe
 	./Test1.exe
 ./Test1.exe: ./Test1.urp $(call GUARD,URVERSION)
 	urweb -dbms sqlite ./Test1
+./Test1.urp: ./Test1.urp.in
+	cat ./Test1.urp.in > ./Test1.urp
+./Test1.urp.in: ./Test1.ur ./lib.urp
+	touch ./Test1.urp.in
+./lib.urp: ./lib.urp.in
+	cat ./lib.urp.in > ./lib.urp
+./lib.urp.in: ./Script.h ./Script.o
+	touch ./lib.urp.in
 ./Script.o: ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL)
-	$(URCC) -c -I $(URINCL) -o ./Script.o ./Script.c
-./Test1.urp: ./Test1.ur ./lib.urp
-	touch ./Test1.urp
-./lib.urp: ./Script.h ./Script.o
-	touch ./lib.urp
+	$(URCC) -c $(URINCL)  -o ./Script.o ./Script.c
 $(call GUARD,URCC):
 	rm -f .cake3/GUARD_URCC_*
 	touch $@
@@ -40,6 +45,8 @@ else
 
 # Prebuild/postbuild section
 
+export MAIN=1
+
 .PHONY: all
 all: .fix-multy1
 .PHONY: clean
@@ -48,16 +55,20 @@ clean: .fix-multy1
 run: .fix-multy1
 .PHONY: ./Test1.exe
 ./Test1.exe: .fix-multy1
-.PHONY: ./Script.o
-./Script.o: .fix-multy1
 .PHONY: ./Test1.urp
 ./Test1.urp: .fix-multy1
+.PHONY: ./Test1.urp.in
+./Test1.urp.in: .fix-multy1
 .PHONY: ./lib.urp
 ./lib.urp: .fix-multy1
+.PHONY: ./lib.urp.in
+./lib.urp.in: .fix-multy1
+.PHONY: ./Script.o
+./Script.o: .fix-multy1
 .INTERMEDIATE: .fix-multy1
 .fix-multy1: 
 	-mkdir .cake3
 	urweb -print-cinclude >/dev/null
-	$(MAKE) -f ./Makefile MAIN=1 $(MAKECMDGOALS)
+	$(MAKE) -f ./Makefile $(MAKECMDGOALS)
 
 endif
