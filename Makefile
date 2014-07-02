@@ -12,25 +12,35 @@ URCC = $(shell $(shell urweb -print-ccompiler) -print-prog-name=gcc)
 URINCL = -I$(shell urweb -print-cinclude) 
 URVERSION = $(shell urweb -version)
 .PHONY: all
-all: ./Test1.exe ./lib.urp
+all: ./Makefile ./Test1.exe ./lib.urp
 .PHONY: clean
-clean: 
+clean: ./Makefile
 	rm -rf .cake3 ./Script.o ./Test1.exe
 .PHONY: run
-run: ./Test1.exe
+run: ./Makefile ./Test1.exe
 	./Test1.exe
-./Test1.exe: ./Test1.urp $(call GUARD,URVERSION)
+./Test1.exe: ./Makefile ./Test1.urp $(call GUARD,URVERSION)
 	urweb -dbms sqlite ./Test1
-./Test1.urp: ./Test1.urp.in
-	cat ./Test1.urp.in > ./Test1.urp
-./Test1.urp.in: ./Test1.ur ./lib.urp
-	touch ./Test1.urp.in
-./lib.urp: ./lib.urp.in
-	cat ./lib.urp.in > ./lib.urp
-./lib.urp.in: ./Script.h ./Script.o
-	touch ./lib.urp.in
-./Script.o: ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL)
-	$(URCC) -c $(URINCL)  -o ./Script.o ./Script.c
+./Test1.urp: ./Makefile ./Test1.ur ./lib.urp .cake3/tmp1
+	cat .cake3/tmp1 > ./Test1.urp
+.cake3/tmp1: ./Makefile
+	-rm -rf .cake3/tmp1
+	echo 'allow url http://code.jquery.com/ui/1.10.3/jquery-ui.js' >> .cake3/tmp1
+	echo 'allow mime text/javascript' >> .cake3/tmp1
+	echo 'library .' >> .cake3/tmp1
+	echo 'debug' >> .cake3/tmp1
+	echo '' >> .cake3/tmp1
+	echo './Test1' >> .cake3/tmp1
+./lib.urp: ./Makefile ./Script.h ./Script.o .cake3/tmp0
+	cat .cake3/tmp0 > ./lib.urp
+.cake3/tmp0: ./Makefile
+	-rm -rf .cake3/tmp0
+	echo 'ffi ./Script' >> .cake3/tmp0
+	echo 'include ./Script.h' >> .cake3/tmp0
+	echo 'link ./Script.o' >> .cake3/tmp0
+	echo '' >> .cake3/tmp0
+./Script.o: ./Makefile ./Script.c $(call GUARD,URCC) $(call GUARD,URINCL) $(call GUARD,UR_CFLAGS)
+	$(URCC) -c $(URINCL) $(UR_CFLAGS)  -o ./Script.o ./Script.c
 $(call GUARD,URCC):
 	rm -f .cake3/GUARD_URCC_*
 	touch $@
@@ -40,12 +50,13 @@ $(call GUARD,URINCL):
 $(call GUARD,URVERSION):
 	rm -f .cake3/GUARD_URVERSION_*
 	touch $@
+$(call GUARD,UR_CFLAGS):
+	rm -f .cake3/GUARD_UR_CFLAGS_*
+	touch $@
 
 else
 
 # Prebuild/postbuild section
-
-export MAIN=1
 
 .PHONY: all
 all: .fix-multy1
@@ -57,18 +68,18 @@ run: .fix-multy1
 ./Test1.exe: .fix-multy1
 .PHONY: ./Test1.urp
 ./Test1.urp: .fix-multy1
-.PHONY: ./Test1.urp.in
-./Test1.urp.in: .fix-multy1
+.PHONY: .cake3/tmp1
+.cake3/tmp1: .fix-multy1
 .PHONY: ./lib.urp
 ./lib.urp: .fix-multy1
-.PHONY: ./lib.urp.in
-./lib.urp.in: .fix-multy1
+.PHONY: .cake3/tmp0
+.cake3/tmp0: .fix-multy1
 .PHONY: ./Script.o
 ./Script.o: .fix-multy1
 .INTERMEDIATE: .fix-multy1
 .fix-multy1: 
 	-mkdir .cake3
 	urweb -print-cinclude >/dev/null
-	$(MAKE) -f ./Makefile $(MAKECMDGOALS)
+	MAIN=1 $(MAKE) -f ./Makefile $(MAKECMDGOALS)
 
 endif
